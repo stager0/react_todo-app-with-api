@@ -302,9 +302,26 @@ export const App: React.FC = () => {
     }
 
     if (updatedTitle === '' && !error) {
-      await handleDelete(todoId);
+      try {
+        setLoadingChangeTodoTitle(true);
+        setLoadingChangeTodoTitleId(todoId);
 
-      error = true;
+        await deleteTodo(todoId);
+
+        setTodos(prev => (prev ? prev.filter(t => t.id !== todoId) : prev));
+
+        setUpdateFormNeeded(false);
+        setActiveChangeTodoId(null);
+        setUpdatedTitle('');
+        setTitleWasChanged(false);
+      } catch {
+        setError('Unable to delete a todo');
+      } finally {
+        setLoadingChangeTodoTitle(false);
+        setLoadingChangeTodoTitleId(null);
+      }
+
+      return;
     }
 
     if (error) {
